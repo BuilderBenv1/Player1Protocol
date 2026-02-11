@@ -5,26 +5,30 @@
 @layer base {
   :root {
     --avax-red: #E84142;
-    --avax-dark: #0A0A0F;
-    --avax-card: #1A1A2E;
+    --avax-dark: #0C0C0C;
+    --avax-card: #161616;
   }
 
   html {
-    @apply bg-avax-dark text-white antialiased;
+    @apply bg-avax-darker text-white antialiased;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply min-h-screen bg-avax-dark;
+    @apply min-h-screen bg-avax-darker;
+    background-image:
+      radial-gradient(ellipse at 50% -20%, rgba(232, 65, 66, 0.06) 0%, transparent 50%);
+    background-attachment: fixed;
   }
 
-  /* Custom scrollbar */
+  /* Xbox-style scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-avax-dark;
+    @apply bg-transparent;
   }
 
   ::-webkit-scrollbar-thumb {
@@ -32,41 +36,70 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-avax-text;
+    @apply bg-avax-red/50;
+  }
+
+  ::selection {
+    @apply bg-avax-red/30 text-white;
   }
 }
 
 @layer components {
+  /* Xbox-style card */
   .card {
-    @apply bg-avax-card border border-avax-border rounded-xl p-6 transition-all duration-200;
+    @apply bg-avax-card border border-avax-border rounded-2xl p-6 transition-all duration-300 relative overflow-hidden;
   }
 
   .card-hover {
-    @apply hover:bg-avax-card-hover hover:border-avax-red/30;
+    @apply hover:bg-avax-card-hover hover:border-avax-border-light hover:shadow-lg;
   }
 
+  .card-hover:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(232, 65, 66, 0.08);
+  }
+
+  /* Elevated card with red top accent */
+  .card-featured {
+    @apply card relative;
+    border-top: 2px solid var(--avax-red);
+  }
+
+  /* Glass panel */
+  .glass {
+    @apply bg-avax-card/60 backdrop-blur-xl border border-white/[0.06];
+  }
+
+  /* Xbox-style buttons */
   .btn-primary {
-    @apply bg-avax-red hover:bg-avax-red-dark text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    @apply bg-avax-red hover:bg-avax-red-light text-white font-semibold py-3 px-6 rounded-xl
+    transition-all duration-200 active:scale-[0.97]
+    disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100
+    shadow-lg shadow-avax-red/20 hover:shadow-avax-red/30;
   }
 
   .btn-secondary {
-    @apply bg-avax-card hover:bg-avax-card-hover text-white border border-avax-border font-semibold py-3 px-6 rounded-lg transition-all duration-200;
+    @apply bg-avax-surface hover:bg-avax-card-hover text-white border border-avax-border
+    font-semibold py-3 px-6 rounded-xl transition-all duration-200;
   }
 
   .btn-ghost {
-    @apply text-avax-text hover:text-white hover:bg-avax-card py-2 px-4 rounded-lg transition-all duration-200;
+    @apply text-avax-text hover:text-white hover:bg-white/[0.06] py-2 px-4 rounded-xl transition-all duration-200;
   }
 
+  /* Xbox-style input */
   .input {
-    @apply bg-avax-dark border border-avax-border rounded-lg px-4 py-3 text-white placeholder-avax-text focus:outline-none focus:border-avax-red focus:ring-1 focus:ring-avax-red transition-all duration-200;
+    @apply bg-avax-dark border border-avax-border rounded-xl px-4 py-3 text-white
+    placeholder-avax-text/50 focus:outline-none focus:border-avax-red/60
+    focus:ring-1 focus:ring-avax-red/30 transition-all duration-200;
   }
 
   .label {
-    @apply text-sm font-medium text-avax-text-light mb-2 block;
+    @apply text-xs font-semibold text-avax-text uppercase tracking-widest mb-2 block;
   }
 
+  /* Badges */
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider;
   }
 
   .badge-common {
@@ -81,59 +114,46 @@
     @apply bg-rarity-legendary-bg text-rarity-legendary;
   }
 
+  /* Status indicators */
   .status-registration {
-    @apply bg-blue-900/50 text-blue-400 border border-blue-500/30;
+    @apply bg-blue-500/10 text-blue-400 border border-blue-500/20;
   }
 
   .status-active {
-    @apply bg-green-900/50 text-green-400 border border-green-500/30;
+    @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
   }
 
   .status-completed {
-    @apply bg-avax-card text-avax-text border border-avax-border;
+    @apply bg-avax-surface text-avax-text border border-avax-border;
   }
 
   .status-cancelled {
-    @apply bg-red-900/50 text-red-400 border border-red-500/30;
+    @apply bg-red-500/10 text-red-400 border border-red-500/20;
   }
 
-  /* Score tier badges */
-  .tier-bronze {
-    @apply text-tier-bronze;
-  }
+  /* Score tiers */
+  .tier-bronze { @apply text-tier-bronze; }
+  .tier-silver { @apply text-tier-silver; }
+  .tier-gold { @apply text-tier-gold; }
+  .tier-platinum { @apply text-tier-platinum; }
+  .tier-diamond { @apply text-tier-diamond; }
 
-  .tier-silver {
-    @apply text-tier-silver;
-  }
-
-  .tier-gold {
-    @apply text-tier-gold;
-  }
-
-  .tier-platinum {
-    @apply text-tier-platinum;
-  }
-
-  .tier-diamond {
-    @apply text-tier-diamond;
-  }
-
-  /* Animated score display */
+  /* Xbox gamerscore display */
   .score-display {
     @apply relative inline-flex items-center justify-center;
   }
 
   .score-ring {
-    @apply absolute inset-0 rounded-full border-4 border-avax-red animate-glow;
+    @apply absolute inset-0 rounded-full;
   }
 
   .score-value {
-    @apply text-5xl md:text-6xl font-bold tabular-nums;
+    @apply text-5xl md:text-6xl font-extrabold tabular-nums tracking-tight;
   }
 
-  /* Table styles */
+  /* Table */
   .table-header {
-    @apply text-left text-sm font-medium text-avax-text uppercase tracking-wider;
+    @apply text-left text-xs font-bold text-avax-text uppercase tracking-widest;
   }
 
   .table-cell {
@@ -141,29 +161,75 @@
   }
 
   .table-row {
-    @apply border-b border-avax-border hover:bg-avax-card-hover transition-colors;
+    @apply border-b border-avax-border/50 hover:bg-white/[0.02] transition-colors;
   }
 
-  /* Skeleton loading */
+  /* Skeleton */
   .skeleton {
-    @apply bg-avax-card animate-pulse rounded;
+    @apply bg-avax-card rounded-xl overflow-hidden relative;
+  }
+
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 bg-shimmer-gradient animate-shimmer;
+    background-size: 200% 100%;
+  }
+
+  /* Xbox-style divider */
+  .divider {
+    @apply border-t border-avax-border/50;
+  }
+
+  /* Stat block */
+  .stat-block {
+    @apply bg-avax-surface/50 rounded-xl p-4 text-center border border-avax-border/50;
+  }
+
+  .stat-block-value {
+    @apply text-2xl md:text-3xl font-bold tracking-tight;
+  }
+
+  .stat-block-label {
+    @apply text-xs text-avax-text uppercase tracking-widest mt-1;
   }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-avax-red to-orange-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-avax-red via-avax-red-light to-avax-red;
+  }
+
+  .text-gradient-warm {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-avax-red to-orange-400;
   }
 
   .glow-red {
-    box-shadow: 0 0 20px rgba(232, 65, 66, 0.4);
+    box-shadow:
+      0 0 20px rgba(232, 65, 66, 0.3),
+      0 0 60px rgba(232, 65, 66, 0.1);
+  }
+
+  .glow-red-sm {
+    box-shadow: 0 0 12px rgba(232, 65, 66, 0.2);
   }
 
   .glow-gold {
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+    box-shadow:
+      0 0 20px rgba(245, 158, 11, 0.3),
+      0 0 60px rgba(245, 158, 11, 0.1);
   }
 
   .truncate-address {
     max-width: 120px;
+  }
+
+  /* Red accent line */
+  .accent-line {
+    @apply h-[2px] bg-gradient-to-r from-avax-red via-avax-red/50 to-transparent;
+  }
+
+  /* Xbox-style section heading */
+  .section-heading {
+    @apply text-xl font-bold uppercase tracking-wide;
   }
 }

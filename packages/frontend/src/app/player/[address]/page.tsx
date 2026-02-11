@@ -14,7 +14,6 @@ import {
 export default function PlayerProfilePage() {
   const params = useParams();
   const address = params.address as Address;
-
   const truncatedAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
 
   const { data: profile, isLoading: profileLoading } = useReadContract({
@@ -40,9 +39,10 @@ export default function PlayerProfilePage() {
 
   if (profileLoading) {
     return (
-      <div className="space-y-8">
-        <div className="card animate-pulse">
-          <div className="h-32 bg-avax-border rounded" />
+      <div className="space-y-6">
+        <div className="skeleton h-48 rounded-2xl" />
+        <div className="grid grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => <div key={i} className="skeleton h-24 rounded-2xl" />)}
         </div>
       </div>
     );
@@ -62,77 +62,92 @@ export default function PlayerProfilePage() {
   const achievements = (achievementHistory as any[]) || [];
 
   return (
-    <div className="space-y-8">
-      {/* Profile Header */}
+    <div className="space-y-6 pb-8">
+      {/* Profile Header — Xbox Gamerscore style */}
       <motion.div
-        className="card bg-gradient-to-br from-avax-card to-avax-darker"
+        className="relative overflow-hidden rounded-2xl border border-avax-border"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          {/* Score Display */}
-          <div className="relative">
-            <div className={`w-32 h-32 rounded-full border-4 ${scoreTier.borderColor} flex items-center justify-center glow-red`}>
-              <div className="text-center">
-                <div className="text-3xl font-bold">{compositeScore.toLocaleString()}</div>
-                <div className="text-xs text-avax-text uppercase">{scoreTier.name}</div>
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-avax-card via-avax-dark to-black" />
+        <div className="absolute top-0 left-0 w-72 h-72 bg-avax-red/[0.06] rounded-full blur-[100px]" />
+
+        <div className="relative p-6 md:p-8">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            {/* Score Circle */}
+            <div className="relative flex-shrink-0">
+              <div className={`w-36 h-36 rounded-full border-[3px] ${scoreTier.borderColor} flex items-center justify-center relative`}>
+                {/* Animated ring */}
+                <div className={`absolute inset-0 rounded-full border-[3px] ${scoreTier.borderColor} animate-pulse-ring opacity-30`} />
+                <div className="text-center">
+                  <div className="text-4xl font-extrabold tracking-tight">{compositeScore.toLocaleString()}</div>
+                  <div className={`text-xs font-bold uppercase tracking-[0.15em] mt-1 ${scoreTier.textColor}`}>{scoreTier.name}</div>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Profile Info */}
-          <div className="flex-1 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-              <h1 className="text-2xl font-bold font-mono">{truncatedAddress}</h1>
-              <button
-                onClick={() => navigator.clipboard.writeText(address)}
-                className="text-avax-text hover:text-white p-1"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              </button>
-            </div>
-            {!hasProfile && (
-              <p className="text-avax-text">No passport found for this address.</p>
-            )}
-          </div>
-
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div className="bg-avax-dark/50 rounded-lg p-3">
-              <div className="text-2xl font-bold text-avax-red">
-                {p1Balance != null ? formatEther(p1Balance) : "0"}
+            {/* Profile Info */}
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
+                <h1 className="text-2xl font-bold font-mono tracking-tight">{truncatedAddress}</h1>
+                <button
+                  onClick={() => navigator.clipboard.writeText(address)}
+                  className="text-avax-text hover:text-white p-1.5 rounded-lg hover:bg-white/[0.06] transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
               </div>
-              <div className="text-xs text-avax-text">P1 Balance</div>
+              {!hasProfile && (
+                <p className="text-avax-text text-sm">No passport found for this address.</p>
+              )}
+              {hasProfile && (
+                <p className="text-avax-text text-sm">
+                  {totalTournaments} tournaments &middot; {totalWins} wins &middot; {achievements.length} achievements
+                </p>
+              )}
             </div>
-            <div className="bg-avax-dark/50 rounded-lg p-3">
-              <div className="text-2xl font-bold text-green-400">{winRate}%</div>
-              <div className="text-xs text-avax-text">Win Rate</div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 gap-3 flex-shrink-0">
+              <div className="bg-black/30 rounded-xl p-4 text-center border border-white/[0.04] min-w-[100px]">
+                <div className="text-2xl font-bold text-avax-red tracking-tight">
+                  {p1Balance != null ? Number(formatEther(p1Balance)).toLocaleString() : "0"}
+                </div>
+                <div className="text-[10px] text-avax-text uppercase tracking-[0.15em] mt-0.5">P1 Balance</div>
+              </div>
+              <div className="bg-black/30 rounded-xl p-4 text-center border border-white/[0.04] min-w-[100px]">
+                <div className="text-2xl font-bold text-emerald-400 tracking-tight">{winRate}%</div>
+                <div className="text-[10px] text-avax-text uppercase tracking-[0.15em] mt-0.5">Win Rate</div>
+              </div>
             </div>
           </div>
         </div>
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Tournaments" value={totalTournaments} />
         <StatCard label="Wins" value={totalWins} />
-        <StatCard label="Top 3 Finishes" value={totalTopThree} />
-        <StatCard label="Prize Money" value={`${formatEther(totalPrizeMoney)} AVAX`} />
+        <StatCard label="Top 3" value={totalTopThree} />
+        <StatCard label="Prize Money" value={`${Number(formatEther(totalPrizeMoney)).toFixed(2)} AVAX`} />
         <StatCard label="Current Streak" value={currentWinStreak} highlight={currentWinStreak >= 3} />
-        <StatCard label="Longest Streak" value={longestWinStreak} />
-        <StatCard label="P1 Earned" value={p1Balance != null ? formatEther(p1Balance) : "0"} />
+        <StatCard label="Best Streak" value={longestWinStreak} />
+        <StatCard label="P1 Earned" value={p1Balance != null ? Number(formatEther(p1Balance)).toLocaleString() : "0"} />
         <StatCard label="Achievements" value={achievements.length} />
       </div>
 
       {/* Achievements */}
-      <div className="card">
-        <h2 className="text-xl font-bold mb-4">Achievements</h2>
+      <div>
+        <h2 className="section-heading text-avax-text-light mb-4">Achievements</h2>
         {achievements.length === 0 ? (
-          <p className="text-avax-text text-center py-6">No achievements unlocked yet.</p>
+          <div className="card text-center py-12">
+            <p className="text-avax-text">No achievements unlocked yet.</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {achievements.map((unlock: any, index: number) => (
               <AchievementUnlockCard
                 key={index}
@@ -155,26 +170,22 @@ function AchievementUnlockCard({ achievementId }: { achievementId: number }) {
   });
 
   if (!achievement) {
-    return (
-      <div className="card text-center animate-pulse">
-        <div className="h-12 w-12 bg-avax-border rounded-full mx-auto mb-2" />
-        <div className="h-4 bg-avax-border rounded w-3/4 mx-auto" />
-      </div>
-    );
+    return <div className="skeleton h-24 rounded-2xl" />;
   }
 
   const rarityLabels = ["Common", "Rare", "Legendary"];
   const rarityColors = ["badge-common", "badge-rare", "badge-legendary"];
+  const rarityBg = ["", "bg-rarity-rare/5", "bg-gradient-to-br from-rarity-legendary-bg/20 to-avax-card"];
 
   return (
-    <div className="card text-center">
-      <div className="w-12 h-12 bg-avax-dark rounded-full mx-auto mb-2 flex items-center justify-center">
-        <svg className="w-6 h-6 text-avax-red" fill="currentColor" viewBox="0 0 20 20">
+    <div className={`card text-center ${rarityBg[Number(achievement.rarity)] || ""}`}>
+      <div className="w-10 h-10 bg-avax-red/10 rounded-xl mx-auto mb-2 flex items-center justify-center">
+        <svg className="w-5 h-5 text-avax-red" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
         </svg>
       </div>
-      <h4 className="font-medium text-sm mb-1">{achievement.name}</h4>
-      <span className={`badge text-xs ${rarityColors[Number(achievement.rarity)] || ""}`}>
+      <h4 className="font-bold text-sm mb-1">{achievement.name}</h4>
+      <span className={`badge text-[10px] ${rarityColors[Number(achievement.rarity)] || ""}`}>
         {rarityLabels[Number(achievement.rarity)] || "Unknown"}
       </span>
     </div>
@@ -191,17 +202,17 @@ function StatCard({
   highlight?: boolean;
 }) {
   return (
-    <div className="card text-center">
-      <div className={`text-2xl font-bold ${highlight ? "text-avax-red" : ""}`}>{value}</div>
-      <div className="text-sm text-avax-text">{label}</div>
+    <div className="stat-block">
+      <div className={`stat-block-value ${highlight ? "text-avax-red" : ""}`}>{value}</div>
+      <div className="stat-block-label">{label}</div>
     </div>
   );
 }
 
-function getScoreTier(score: number): { name: string; borderColor: string } {
-  if (score >= 50000) return { name: "Diamond", borderColor: "border-tier-diamond" };
-  if (score >= 10000) return { name: "Platinum", borderColor: "border-tier-platinum" };
-  if (score >= 5000) return { name: "Gold", borderColor: "border-tier-gold" };
-  if (score >= 1000) return { name: "Silver", borderColor: "border-tier-silver" };
-  return { name: "Bronze", borderColor: "border-tier-bronze" };
+function getScoreTier(score: number): { name: string; borderColor: string; textColor: string } {
+  if (score >= 50000) return { name: "Diamond", borderColor: "border-tier-diamond", textColor: "text-tier-diamond" };
+  if (score >= 10000) return { name: "Platinum", borderColor: "border-tier-platinum", textColor: "text-tier-platinum" };
+  if (score >= 5000) return { name: "Gold", borderColor: "border-tier-gold", textColor: "text-tier-gold" };
+  if (score >= 1000) return { name: "Silver", borderColor: "border-tier-silver", textColor: "text-tier-silver" };
+  return { name: "Bronze", borderColor: "border-tier-bronze", textColor: "text-tier-bronze" };
 }

@@ -14,15 +14,6 @@ import {
 const STATUS_LABELS = ["Registration", "Active", "Completed", "Cancelled", "Finalized"] as const;
 type StatusFilter = "all" | "Registration" | "Active" | "Completed";
 
-// Sort priority: Active=0 > Registration=1 > Completed=2 > rest=3
-const STATUS_SORT_ORDER: Record<string, number> = {
-  Active: 0,
-  Registration: 1,
-  Completed: 2,
-  Finalized: 2,
-  Cancelled: 3,
-};
-
 export default function TournamentsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
@@ -32,51 +23,60 @@ export default function TournamentsPage() {
     functionName: "getTournaments",
   });
 
-  // Reverse so newest first (factory appends, so last = newest)
   const addresses = useMemo(() => {
     const raw = (tournamentAddresses as Address[]) || [];
     return [...raw].reverse();
   }, [tournamentAddresses]);
 
+  const filters: { key: StatusFilter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "Registration", label: "Open" },
+    { key: "Active", label: "Live" },
+    { key: "Completed", label: "Ended" },
+  ];
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Tournaments</h1>
-          <p className="text-avax-text">Browse and join trustless on-chain tournaments</p>
+          <h1 className="text-3xl font-extrabold tracking-tight">TOURNAMENTS</h1>
+          <p className="text-avax-text text-sm mt-1">Browse and join trustless on-chain tournaments</p>
         </div>
         <Link href="/tournaments/create" className="btn-primary">
-          Create Tournament
+          + Create Tournament
         </Link>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2">
-        {(["all", "Registration", "Active", "Completed"] as const).map((status) => (
+      <div className="flex gap-2">
+        {filters.map(({ key, label }) => (
           <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              statusFilter === status
-                ? "bg-avax-red text-white"
-                : "bg-avax-card text-avax-text hover:text-white"
+            key={key}
+            onClick={() => setStatusFilter(key)}
+            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+              statusFilter === key
+                ? "bg-avax-red text-white shadow-lg shadow-avax-red/20"
+                : "bg-avax-card text-avax-text hover:text-white border border-avax-border hover:border-avax-border-light"
             }`}
           >
-            {status === "all" ? "All" : status}
+            {label}
           </button>
         ))}
       </div>
 
-      {/* Tournament Grid */}
+      {/* Grid */}
       {isLoading ? (
-        <div className="text-center py-12 text-avax-text">Loading tournaments...</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-56 rounded-2xl" />)}
+        </div>
       ) : addresses.length === 0 ? (
-        <div className="text-center py-12 text-avax-text">
-          No tournaments created yet. Be the first to create one!
+        <div className="text-center py-20">
+          <p className="text-avax-text text-lg">No tournaments created yet.</p>
+          <p className="text-avax-text text-sm mt-1">Be the first to create one.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {addresses.map((addr, index) => (
             <TournamentCard
               key={addr}
@@ -127,15 +127,11 @@ function TournamentCard({
   if (!config || status === undefined) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: index * 0.1 }}
+        transition={{ duration: 0.3, delay: index * 0.05 }}
       >
-        <div className="card h-full animate-pulse">
-          <div className="h-6 bg-avax-border rounded w-3/4 mb-4" />
-          <div className="h-4 bg-avax-border rounded w-1/2 mb-2" />
-          <div className="h-4 bg-avax-border rounded w-1/3" />
-        </div>
+        <div className="skeleton h-56 rounded-2xl" />
       </motion.div>
     );
   }
@@ -146,12 +142,10 @@ function TournamentCard({
   const currentPlayerCount = Number(playerCount || 0n);
   const maxPlayers = Number(config.maxPlayers);
 
-  // Hide expired Registration tournaments with 0 players
   if (statusLabel === "Registration" && timeRemaining <= 0 && currentPlayerCount === 0) {
     return null;
   }
 
-  // Apply filter
   if (statusFilter !== "all" && statusLabel !== statusFilter) {
     return null;
   }
@@ -165,65 +159,72 @@ function TournamentCard({
   };
 
   const isRegistrationOpen = statusLabel === "Registration" && timeRemaining > 0;
+  const fillPercent = (currentPlayerCount / maxPlayers) * 100;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
     >
       <Link href={`/tournaments/${address}`}>
-        <div className="card card-hover h-full">
+        <div className="card card-hover h-full group">
+          {/* Red top accent on active */}
+          {statusLabel === "Active" && (
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-emerald-400" />
+          )}
+          {isRegistrationOpen && (
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-blue-400" />
+          )}
+
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="font-semibold text-lg mb-1">{config.name}</h3>
-              <p className="text-sm text-avax-text font-mono">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-base truncate tracking-tight">{config.name}</h3>
+              <p className="text-xs text-avax-text font-mono mt-0.5">
                 {address.slice(0, 6)}...{address.slice(-4)}
               </p>
             </div>
-            <span className={`badge ${statusColors[statusLabel] || ""}`}>
-              {statusLabel}
+            <span className={`badge ml-3 flex-shrink-0 ${statusColors[statusLabel] || ""}`}>
+              {statusLabel === "Registration" ? "Open" : statusLabel}
             </span>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
             <div>
-              <p className="text-sm text-avax-text">Entry Fee</p>
-              <p className="font-semibold">
+              <p className="text-[10px] text-avax-text uppercase tracking-widest">Entry</p>
+              <p className="font-bold text-sm">
                 {config.entryFee === 0n ? "Free" : `${formatEther(config.entryFee)} AVAX`}
               </p>
             </div>
             <div>
-              <p className="text-sm text-avax-text">Prize Pool</p>
-              <p className="font-semibold text-avax-red">
+              <p className="text-[10px] text-avax-text uppercase tracking-widest">Prize Pool</p>
+              <p className="font-bold text-sm text-avax-red">
                 {prizePool != null ? formatEther(prizePool) : "0"} AVAX
               </p>
             </div>
             <div>
-              <p className="text-sm text-avax-text">Players</p>
-              <p className="font-semibold">
+              <p className="text-[10px] text-avax-text uppercase tracking-widest">Players</p>
+              <p className="font-bold text-sm">
                 {currentPlayerCount} / {maxPlayers}
               </p>
             </div>
             <div>
-              <p className="text-sm text-avax-text">
-                {isRegistrationOpen ? "Closes In" : "Status"}
+              <p className="text-[10px] text-avax-text uppercase tracking-widest">
+                {isRegistrationOpen ? "Closes" : "Status"}
               </p>
-              <p className="font-semibold">
+              <p className="font-bold text-sm">
                 {isRegistrationOpen ? formatTimeRemaining(timeRemaining) : statusLabel}
               </p>
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="relative h-2 bg-avax-dark rounded-full overflow-hidden">
+          {/* Progress */}
+          <div className="relative h-1 bg-avax-dark rounded-full overflow-hidden">
             <div
-              className="absolute inset-y-0 left-0 bg-avax-red rounded-full transition-all"
-              style={{
-                width: `${(currentPlayerCount / maxPlayers) * 100}%`,
-              }}
+              className="absolute inset-y-0 left-0 bg-avax-red rounded-full transition-all duration-500"
+              style={{ width: `${fillPercent}%` }}
             />
           </div>
         </div>
@@ -234,18 +235,12 @@ function TournamentCard({
 
 function formatTimeRemaining(ms: number): string {
   if (ms <= 0) return "Closed";
-
   const hours = Math.floor(ms / 3600000);
   const minutes = Math.floor((ms % 3600000) / 60000);
-
   if (hours > 24) {
     const days = Math.floor(hours / 24);
     return `${days}d ${hours % 24}h`;
   }
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-
+  if (hours > 0) return `${hours}h ${minutes}m`;
   return `${minutes}m`;
 }

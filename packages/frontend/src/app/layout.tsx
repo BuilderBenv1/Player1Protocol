@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "@/components/shared/Toaster";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Player1 Protocol",
@@ -28,10 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-avax-dark text-white min-h-screen flex flex-col`}>
+      <body className={`${inter.variable} font-sans bg-avax-darker text-white min-h-screen flex flex-col antialiased`}>
         <Providers>
           <Header />
-          <main className="flex-1 container mx-auto px-4 py-8">
+          <main className="flex-1 container mx-auto px-4 py-8 max-w-7xl">
             {children}
           </main>
           <Footer />
