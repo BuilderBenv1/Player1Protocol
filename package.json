@@ -13,7 +13,10 @@
     "test:contracts": "npm run test --workspace=@player1/contracts",
     "coverage": "npm run coverage --workspace=@player1/contracts",
     "deploy:fuji": "npm run deploy:fuji --workspace=@player1/contracts",
-    "verify:fuji": "npm run verify:fuji --workspace=@player1/contracts"
+    "verify:fuji": "npm run verify:fuji --workspace=@player1/contracts",
+    "api:dev": "npm run dev --workspace=@player1/api",
+    "api:build": "npm run build --workspace=@player1/api",
+    "api:start": "npm run start --workspace=@player1/api"
   },
   "devDependencies": {
     "turbo": "2.3.3"
