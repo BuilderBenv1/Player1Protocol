@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --avax-red: #E84142;
+    --avax-dark: #0A0A0F;
+    --avax-card: #1A1A2E;
+  }
+
+  html {
+    @apply bg-avax-dark text-white antialiased;
+  }
+
+  body {
+    @apply min-h-screen bg-avax-dark;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-avax-dark;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-avax-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-avax-text;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-avax-card border border-avax-border rounded-xl p-6 transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:bg-avax-card-hover hover:border-avax-red/30;
+  }
+
+  .btn-primary {
+    @apply bg-avax-red hover:bg-avax-red-dark text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+  }
+
+  .btn-secondary {
+    @apply bg-avax-card hover:bg-avax-card-hover text-white border border-avax-border font-semibold py-3 px-6 rounded-lg transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply text-avax-text hover:text-white hover:bg-avax-card py-2 px-4 rounded-lg transition-all duration-200;
+  }
+
+  .input {
+    @apply bg-avax-dark border border-avax-border rounded-lg px-4 py-3 text-white placeholder-avax-text focus:outline-none focus:border-avax-red focus:ring-1 focus:ring-avax-red transition-all duration-200;
+  }
+
+  .label {
+    @apply text-sm font-medium text-avax-text-light mb-2 block;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-common {
+    @apply bg-rarity-common-bg text-rarity-common;
+  }
+
+  .badge-rare {
+    @apply bg-rarity-rare-bg text-rarity-rare;
+  }
+
+  .badge-legendary {
+    @apply bg-rarity-legendary-bg text-rarity-legendary;
+  }
+
+  .status-registration {
+    @apply bg-blue-900/50 text-blue-400 border border-blue-500/30;
+  }
+
+  .status-active {
+    @apply bg-green-900/50 text-green-400 border border-green-500/30;
+  }
+
+  .status-completed {
+    @apply bg-avax-card text-avax-text border border-avax-border;
+  }
+
+  .status-cancelled {
+    @apply bg-red-900/50 text-red-400 border border-red-500/30;
+  }
+
+  /* Score tier badges */
+  .tier-bronze {
+    @apply text-tier-bronze;
+  }
+
+  .tier-silver {
+    @apply text-tier-silver;
+  }
+
+  .tier-gold {
+    @apply text-tier-gold;
+  }
+
+  .tier-platinum {
+    @apply text-tier-platinum;
+  }
+
+  .tier-diamond {
+    @apply text-tier-diamond;
+  }
+
+  /* Animated score display */
+  .score-display {
+    @apply relative inline-flex items-center justify-center;
+  }
+
+  .score-ring {
+    @apply absolute inset-0 rounded-full border-4 border-avax-red animate-glow;
+  }
+
+  .score-value {
+    @apply text-5xl md:text-6xl font-bold tabular-nums;
+  }
+
+  /* Table styles */
+  .table-header {
+    @apply text-left text-sm font-medium text-avax-text uppercase tracking-wider;
+  }
+
+  .table-cell {
+    @apply py-4 px-4 text-sm text-white;
+  }
+
+  .table-row {
+    @apply border-b border-avax-border hover:bg-avax-card-hover transition-colors;
+  }
+
+  /* Skeleton loading */
+  .skeleton {
+    @apply bg-avax-card animate-pulse rounded;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-avax-red to-orange-500;
+  }
+
+  .glow-red {
+    box-shadow: 0 0 20px rgba(232, 65, 66, 0.4);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  }
+
+  .truncate-address {
+    max-width: 120px;
+  }
+}

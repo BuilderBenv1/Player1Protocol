@@ -1,0 +1,20 @@
+{
+  "chainId": 43113,
+  "networkName": "Avalanche Fuji Testnet",
+  "deployer": "0x16f057E27189735B424dBA8559e9670103677F35",
+  "deployedAt": "2026-02-07T12:00:00Z",
+  "contracts": {
+    "P1Token": "0xD5413889C518AC479731B06DD5d063cD08B4b1cb",
+    "AchievementRegistry": "0xaC7EF608641Ae0D8b027C735BbC80C513766219b",
+    "PlayerPassport": "0xAfD4C1B72c6514C3B43de62EaE310657F02bccf5",
+    "Tournament": "0x77f85f08A39d8EE924b95AE6Fe3327D112e26a2a",
+    "TournamentFactory": "0x734974f3C20Da199Bbb30D5d50e59b439A44404B",
+    "RewardDistributor": "0xf9436653C09095Fc78B4C87F38A9659f4f03aC0F",
+    "DemoGame": "0x8b8792206fcBCbD9C7E175d793eed339c90Dbeb7"
+  },
+  "vrfConfig": {
+    "coordinator": "0x5C210eF41CD1a72de73bF76eC39637bB0d3d7BEE",
+    "keyHash": "0xc799bd1e3bd4d1a41cd4968997a4e03dfd2a3c7c04b695881138580163f42887",
+    "subscriptionId": ""
+  }
+}

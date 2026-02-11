@@ -1,0 +1,24 @@
+{
+  "name": "player1-protocol",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "dev": "turbo run dev",
+    "compile": "npm run compile --workspace=@player1/contracts",
+    "test:contracts": "npm run test --workspace=@player1/contracts",
+    "coverage": "npm run coverage --workspace=@player1/contracts",
+    "deploy:fuji": "npm run deploy:fuji --workspace=@player1/contracts",
+    "verify:fuji": "npm run verify:fuji --workspace=@player1/contracts"
+  },
+  "devDependencies": {
+    "turbo": "2.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

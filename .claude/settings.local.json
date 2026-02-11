@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx hardhat test:*)",
+      "Bash(npm test:*)",
+      "Bash(npm install:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(npx hardhat clean)",
+      "Bash(npx hardhat:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx next build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(1 <<'EOF'\nconst demoGame = await ethers.getContractAt\\(\"DemoGame\", \"0x8b8792206fcBCbD9C7E175d793eed339c90Dbeb7\"\\);\n\nconsole.log\\(\"Registering demo achievements...\"\\);\nconst tx = await demoGame.registerDemoAchievements\\({ gasLimit: 2000000 }\\);\nconsole.log\\(\"TX hash:\", tx.hash\\);\nconst receipt = await tx.wait\\(\\);\nconsole.log\\(\"Confirmed in block:\", receipt.blockNumber\\);\n\nconst registry = await ethers.getContractAt\\(\"AchievementRegistry\", \"0xaC7EF608641Ae0D8b027C735BbC80C513766219b\"\\);\nconst count = await registry.getAchievementCount\\(\\);\nconsole.log\\(\"\\\\nAchievement count after registration:\", count.toString\\(\\)\\);\nfor \\(let i = 1; i <= count; i++\\) {\n  const a = await registry.getAchievement\\(i\\);\n  console.log\\(`  #${i}: ${a.name} \\(${[\"Common\",\"Rare\",\"Legendary\"][a.rarity]}\\) - ${a.description}`\\);\n}\nEOF)",
+      "Bash(set:*)",
+      "Bash(cmd /c \"set CONFIRM_MAINNET=true && npx hardhat run scripts/deploy.ts --network mainnet\")",
+      "Bash($env:CONFIRM_MAINNET=\"true\")",
+      "Bash(CONFIRM_MAINNET=true npx hardhat run:*)",
+      "WebFetch(domain:snowtrace.io)",
+      "Bash(curl:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
