@@ -30,6 +30,11 @@ interface DeploymentResult {
     TournamentFactory: string;
     RewardDistributor: string;
     DemoGame: string;
+    Leaderboard: string;
+    SocialGraph: string;
+    LFG: string;
+    PlayerReputation: string;
+    ClubFactory: string;
   };
   vrfConfig: {
     coordinator: string;
@@ -246,6 +251,52 @@ async function main() {
   }
 
   // ═══════════════════════════════════════════════════════════════════════
+  // STEP 13: Deploy Leaderboard
+  // ═══════════════════════════════════════════════════════════════════════
+  console.log("Step 13: Deploying Leaderboard...");
+  const LeaderboardFactory = await ethers.getContractFactory("Leaderboard");
+  const leaderboard = await LeaderboardFactory.deploy(deployer.address);
+  await leaderboard.waitForDeployment();
+  console.log(`Leaderboard deployed: ${await leaderboard.getAddress()}\n`);
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // STEP 14: Deploy SocialGraph
+  // ═══════════════════════════════════════════════════════════════════════
+  console.log("Step 14: Deploying SocialGraph...");
+  const SocialGraphFactory = await ethers.getContractFactory("SocialGraph");
+  const socialGraph = await SocialGraphFactory.deploy();
+  await socialGraph.waitForDeployment();
+  console.log(`SocialGraph deployed: ${await socialGraph.getAddress()}\n`);
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // STEP 15: Deploy LFG
+  // ═══════════════════════════════════════════════════════════════════════
+  console.log("Step 15: Deploying LFG...");
+  const LFGFactory = await ethers.getContractFactory("LFG");
+  const lfg = await LFGFactory.deploy(await passport.getAddress());
+  await lfg.waitForDeployment();
+  console.log(`LFG deployed: ${await lfg.getAddress()}\n`);
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // STEP 16: Deploy PlayerReputation
+  // ═══════════════════════════════════════════════════════════════════════
+  console.log("Step 16: Deploying PlayerReputation...");
+  const ReputationFactory = await ethers.getContractFactory("PlayerReputation");
+  const playerReputation = await ReputationFactory.deploy(deployer.address);
+  await playerReputation.waitForDeployment();
+  console.log(`PlayerReputation deployed: ${await playerReputation.getAddress()}\n`);
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // STEP 17: Deploy ClubFactory
+  // ═══════════════════════════════════════════════════════════════════════
+  console.log("Step 17: Deploying ClubFactory...");
+  const CLUB_CREATION_FEE = ethers.parseEther("0.01"); // 0.01 AVAX
+  const ClubFactoryFactory = await ethers.getContractFactory("ClubFactory");
+  const clubFactory = await ClubFactoryFactory.deploy(TREASURY_ADDRESS, CLUB_CREATION_FEE);
+  await clubFactory.waitForDeployment();
+  console.log(`ClubFactory deployed: ${await clubFactory.getAddress()}\n`);
+
+  // ═══════════════════════════════════════════════════════════════════════
   // Save deployment addresses
   // ═══════════════════════════════════════════════════════════════════════
   const deployment: DeploymentResult = {
@@ -261,6 +312,11 @@ async function main() {
       TournamentFactory: await factory.getAddress(),
       RewardDistributor: await rewardDistributor.getAddress(),
       DemoGame: demoGameAddress,
+      Leaderboard: await leaderboard.getAddress(),
+      SocialGraph: await socialGraph.getAddress(),
+      LFG: await lfg.getAddress(),
+      PlayerReputation: await playerReputation.getAddress(),
+      ClubFactory: await clubFactory.getAddress(),
     },
     vrfConfig: {
       coordinator: vrfCoordinator,
@@ -296,6 +352,11 @@ async function main() {
   console.log(`  TournamentFactory:  ${deployment.contracts.TournamentFactory}`);
   console.log(`  RewardDistributor:  ${deployment.contracts.RewardDistributor}`);
   console.log(`  DemoGame:           ${deployment.contracts.DemoGame}`);
+  console.log(`  Leaderboard:        ${deployment.contracts.Leaderboard}`);
+  console.log(`  SocialGraph:        ${deployment.contracts.SocialGraph}`);
+  console.log(`  LFG:                ${deployment.contracts.LFG}`);
+  console.log(`  PlayerReputation:   ${deployment.contracts.PlayerReputation}`);
+  console.log(`  ClubFactory:        ${deployment.contracts.ClubFactory}`);
   console.log("========================================");
 
   if (!isLocalNetwork) {

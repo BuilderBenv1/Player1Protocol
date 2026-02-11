@@ -141,3 +141,77 @@ export interface TournamentCompletedEvent {
   prizePool: bigint;
   winner: `0x${string}`;
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// Xbox Live Feature Types
+// ═══════════════════════════════════════════════════════════════════
+
+export enum LeaderboardPeriod {
+  AllTime = 0,
+  Monthly = 1,
+  Weekly = 2,
+  Daily = 3,
+}
+
+export interface LeaderboardScore {
+  player: `0x${string}`;
+  value: bigint;
+  timestamp: bigint;
+}
+
+export interface PlayerRank {
+  rank: bigint;
+  score: bigint;
+}
+
+export interface ReputationData {
+  positive: bigint;
+  negative: bigint;
+  total: bigint;
+  score: bigint;
+}
+
+export interface LFGListing {
+  id: bigint;
+  creator: `0x${string}`;
+  game: `0x${string}`;
+  activity: string;
+  minScore: bigint;
+  maxScore: bigint;
+  playersNeeded: bigint;
+  playersJoined: bigint;
+  players: `0x${string}`[];
+  createdAt: bigint;
+  expiresAt: bigint;
+  active: boolean;
+}
+
+export interface LFGParams {
+  game: `0x${string}`;
+  activity: string;
+  minScore?: bigint;
+  maxScore?: bigint;
+  playersNeeded: number;
+  duration: number;
+}
+
+export interface ClubInfo {
+  name: string;
+  tag: string;
+  description: string;
+  owner: `0x${string}`;
+  memberCount: bigint;
+  maxMembers: bigint;
+  membershipFee: bigint;
+  inviteOnly: boolean;
+  treasury: bigint;
+}
+
+export interface ClubParams {
+  name: string;
+  tag: string;
+  description: string;
+  membershipFee?: bigint;
+  maxMembers?: number;
+  inviteOnly?: boolean;
+}

@@ -8,6 +8,11 @@ export interface ContractAddresses {
   PlayerPassport: `0x${string}`;
   TournamentFactory: `0x${string}`;
   RewardDistributor: `0x${string}`;
+  Leaderboard: `0x${string}`;
+  SocialGraph: `0x${string}`;
+  LFG: `0x${string}`;
+  PlayerReputation: `0x${string}`;
+  ClubFactory: `0x${string}`;
 }
 
 export const SUPPORTED_CHAINS = {
@@ -26,6 +31,12 @@ export const CONTRACT_ADDRESSES: Record<number, ContractAddresses> = {
     PlayerPassport: "0xe354C6394AAC25a786C27334d2B7bEf367bebDf8",
     TournamentFactory: "0x2EE6635740F8fE3b6B9765A245D0b66Ef013fE5c",
     RewardDistributor: "0xd4A5C78E87267c93fB738c56F1434591fBe8C03D",
+    // New Xbox Live contracts — deploy and update addresses
+    Leaderboard: "0x0000000000000000000000000000000000000000",
+    SocialGraph: "0x0000000000000000000000000000000000000000",
+    LFG: "0x0000000000000000000000000000000000000000",
+    PlayerReputation: "0x0000000000000000000000000000000000000000",
+    ClubFactory: "0x0000000000000000000000000000000000000000",
   },
   // Avalanche Fuji Testnet
   [SUPPORTED_CHAINS.AVALANCHE_FUJI]: {
@@ -34,6 +45,11 @@ export const CONTRACT_ADDRESSES: Record<number, ContractAddresses> = {
     PlayerPassport: "0xAfD4C1B72c6514C3B43de62EaE310657F02bccf5",
     TournamentFactory: "0x734974f3C20Da199Bbb30D5d50e59b439A44404B",
     RewardDistributor: "0xf9436653C09095Fc78B4C87F38A9659f4f03aC0F",
+    Leaderboard: "0x0000000000000000000000000000000000000000",
+    SocialGraph: "0x0000000000000000000000000000000000000000",
+    LFG: "0x0000000000000000000000000000000000000000",
+    PlayerReputation: "0x0000000000000000000000000000000000000000",
+    ClubFactory: "0x0000000000000000000000000000000000000000",
   },
 };
 

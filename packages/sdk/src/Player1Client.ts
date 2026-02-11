@@ -16,6 +16,12 @@ import {
   TOURNAMENT_FACTORY_ABI,
   TOURNAMENT_ABI,
   ACHIEVEMENT_REGISTRY_ABI,
+  LEADERBOARD_ABI,
+  SOCIAL_GRAPH_ABI,
+  LFG_ABI,
+  PLAYER_REPUTATION_ABI,
+  CLUB_ABI,
+  CLUB_FACTORY_ABI,
 } from "./contracts/abis";
 import type {
   PlayerProfile,
@@ -29,7 +35,15 @@ import type {
   AchievementUnlock,
   TournamentStatus,
   Rarity,
+  LeaderboardScore,
+  PlayerRank,
+  ReputationData,
+  LFGListing,
+  LFGParams,
+  ClubInfo,
+  ClubParams,
 } from "./types";
+import { LeaderboardPeriod } from "./types";
 
 export interface Player1Config {
   chain: Chain;
@@ -416,6 +430,358 @@ export class Player1Client {
       account: wallet.account,
       chain: this.chain,
     });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // LEADERBOARD OPERATIONS
+  // ═══════════════════════════════════════════════════════════════════
+
+  async getTopScores(leaderboardId: `0x${string}`, period: LeaderboardPeriod = LeaderboardPeriod.AllTime, limit = 10): Promise<LeaderboardScore[]> {
+    const raw = await this.publicClient.readContract({
+      address: this.contracts.Leaderboard,
+      abi: LEADERBOARD_ABI,
+      functionName: "getTopScores",
+      args: [leaderboardId, period, BigInt(limit)],
+    });
+    return raw as any as LeaderboardScore[];
+  }
+
+  async getPlayerRank(leaderboardId: `0x${string}`, period: LeaderboardPeriod, player: Address): Promise<PlayerRank> {
+    const raw = await this.publicClient.readContract({
+      address: this.contracts.Leaderboard,
+      abi: LEADERBOARD_ABI,
+      functionName: "getPlayerRank",
+      args: [leaderboardId, period, player],
+    });
+    const r = raw as any;
+    return { rank: r[0], score: r[1] };
+  }
+
+  async getGameLeaderboards(game: Address): Promise<`0x${string}`[]> {
+    return this.publicClient.readContract({
+      address: this.contracts.Leaderboard,
+      abi: LEADERBOARD_ABI,
+      functionName: "getGameLeaderboards",
+      args: [game],
+    }) as Promise<`0x${string}`[]>;
+  }
+
+  async submitScore(leaderboardId: `0x${string}`, player: Address, value: bigint): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.Leaderboard,
+      abi: LEADERBOARD_ABI,
+      functionName: "submitScore",
+      args: [leaderboardId, player, value],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SOCIAL GRAPH OPERATIONS
+  // ═══════════════════════════════════════════════════════════════════
+
+  async follow(player: Address): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "follow",
+      args: [player],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async unfollow(player: Address): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "unfollow",
+      args: [player],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async blockPlayer(player: Address): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "blockPlayer",
+      args: [player],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async getFollowing(player: Address): Promise<Address[]> {
+    return this.publicClient.readContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "getFollowing",
+      args: [player],
+    }) as Promise<Address[]>;
+  }
+
+  async getFollowers(player: Address): Promise<Address[]> {
+    return this.publicClient.readContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "getFollowers",
+      args: [player],
+    }) as Promise<Address[]>;
+  }
+
+  async getFriends(player: Address): Promise<Address[]> {
+    return this.publicClient.readContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "getFriends",
+      args: [player],
+    }) as Promise<Address[]>;
+  }
+
+  async areFriends(a: Address, b: Address): Promise<boolean> {
+    return this.publicClient.readContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "areFriends",
+      args: [a, b],
+    }) as Promise<boolean>;
+  }
+
+  async isFollowing(follower: Address, followed: Address): Promise<boolean> {
+    return this.publicClient.readContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "isFollowing",
+      args: [follower, followed],
+    }) as Promise<boolean>;
+  }
+
+  async getBio(player: Address): Promise<string> {
+    return this.publicClient.readContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "bio",
+      args: [player],
+    }) as Promise<string>;
+  }
+
+  async setBio(bio: string): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.SocialGraph,
+      abi: SOCIAL_GRAPH_ABI,
+      functionName: "setBio",
+      args: [bio],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // LFG OPERATIONS
+  // ═══════════════════════════════════════════════════════════════════
+
+  async createLFGListing(params: LFGParams): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.LFG,
+      abi: LFG_ABI,
+      functionName: "createListing",
+      args: [
+        params.game,
+        params.activity,
+        params.minScore || 0n,
+        params.maxScore || 0n,
+        BigInt(params.playersNeeded),
+        BigInt(params.duration),
+      ],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async joinListing(listingId: bigint): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.LFG,
+      abi: LFG_ABI,
+      functionName: "joinListing",
+      args: [listingId],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async leaveListing(listingId: bigint): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.LFG,
+      abi: LFG_ABI,
+      functionName: "leaveListing",
+      args: [listingId],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async getLFGListing(listingId: bigint): Promise<LFGListing> {
+    const raw = await this.publicClient.readContract({
+      address: this.contracts.LFG,
+      abi: LFG_ABI,
+      functionName: "getListing",
+      args: [listingId],
+    });
+    const r = raw as any;
+    return {
+      id: r[0], creator: r[1], game: r[2], activity: r[3],
+      minScore: r[4], maxScore: r[5], playersNeeded: r[6], playersJoined: r[7],
+      players: r[8], createdAt: r[9], expiresAt: r[10], active: r[11],
+    };
+  }
+
+  async getActiveListingsForGame(game: Address): Promise<bigint[]> {
+    return this.publicClient.readContract({
+      address: this.contracts.LFG,
+      abi: LFG_ABI,
+      functionName: "getActiveListingsForGame",
+      args: [game],
+    }) as Promise<bigint[]>;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // REPUTATION OPERATIONS
+  // ═══════════════════════════════════════════════════════════════════
+
+  async ratePlayer(player: Address, positive: boolean): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: this.contracts.PlayerReputation,
+      abi: PLAYER_REPUTATION_ABI,
+      functionName: "ratePlayer",
+      args: [player, positive],
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async getReputation(player: Address): Promise<ReputationData> {
+    const raw = await this.publicClient.readContract({
+      address: this.contracts.PlayerReputation,
+      abi: PLAYER_REPUTATION_ABI,
+      functionName: "getReputation",
+      args: [player],
+    });
+    const r = raw as any;
+    return { positive: r[0], negative: r[1], total: r[2], score: r[3] };
+  }
+
+  async getReputationPercent(player: Address): Promise<bigint> {
+    return this.publicClient.readContract({
+      address: this.contracts.PlayerReputation,
+      abi: PLAYER_REPUTATION_ABI,
+      functionName: "getReputationPercent",
+      args: [player],
+    }) as Promise<bigint>;
+  }
+
+  async canRatePlayer(rater: Address, player: Address): Promise<boolean> {
+    return this.publicClient.readContract({
+      address: this.contracts.PlayerReputation,
+      abi: PLAYER_REPUTATION_ABI,
+      functionName: "canRate",
+      args: [rater, player],
+    }) as Promise<boolean>;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // CLUB OPERATIONS
+  // ═══════════════════════════════════════════════════════════════════
+
+  async createClub(params: ClubParams): Promise<Hash> {
+    const wallet = this.requireWallet();
+    const creationFee = await this.publicClient.readContract({
+      address: this.contracts.ClubFactory,
+      abi: CLUB_FACTORY_ABI,
+      functionName: "creationFee",
+    }) as bigint;
+
+    return wallet.writeContract({
+      address: this.contracts.ClubFactory,
+      abi: CLUB_FACTORY_ABI,
+      functionName: "createClub",
+      args: [
+        params.name,
+        params.tag,
+        params.description,
+        params.membershipFee || 0n,
+        BigInt(params.maxMembers || 100),
+        params.inviteOnly || false,
+      ],
+      value: creationFee,
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async joinClub(club: Address): Promise<Hash> {
+    const wallet = this.requireWallet();
+    const info = await this.getClubInfo(club);
+    return wallet.writeContract({
+      address: club,
+      abi: CLUB_ABI,
+      functionName: "join",
+      value: info.membershipFee,
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async leaveClub(club: Address): Promise<Hash> {
+    const wallet = this.requireWallet();
+    return wallet.writeContract({
+      address: club,
+      abi: CLUB_ABI,
+      functionName: "leave",
+      account: wallet.account,
+      chain: this.chain,
+    });
+  }
+
+  async getClubInfo(club: Address): Promise<ClubInfo> {
+    const raw = await this.publicClient.readContract({
+      address: club,
+      abi: CLUB_ABI,
+      functionName: "getClubInfo",
+    });
+    const r = raw as any;
+    return {
+      name: r[0], tag: r[1], description: r[2], owner: r[3],
+      memberCount: r[4], maxMembers: r[5], membershipFee: r[6],
+      inviteOnly: r[7], treasury: r[8],
+    };
+  }
+
+  async getAllClubs(): Promise<Address[]> {
+    return this.publicClient.readContract({
+      address: this.contracts.ClubFactory,
+      abi: CLUB_FACTORY_ABI,
+      functionName: "getAllClubs",
+    }) as Promise<Address[]>;
+  }
+
+  async getClubMembers(club: Address): Promise<Address[]> {
+    return this.publicClient.readContract({
+      address: club,
+      abi: CLUB_ABI,
+      functionName: "getMembers",
+    }) as Promise<Address[]>;
   }
 
   // ═══════════════════════════════════════════════════════════════════
