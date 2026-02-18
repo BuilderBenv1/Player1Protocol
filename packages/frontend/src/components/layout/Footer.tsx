@@ -70,6 +70,11 @@ export function Footer() {
                   Snowtrace Explorer
                 </a>
               </li>
+              <li>
+                <Link href="/whitepaper" className="text-avax-text hover:text-white transition-colors">
+                  Whitepaper
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

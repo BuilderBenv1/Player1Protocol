@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { href: "/lfg", label: "LFG" },
   { href: "/clubs", label: "Clubs" },
   { href: "/achievements", label: "Achievements" },
+  { href: "/whitepaper", label: "Whitepaper" },
 ];
 
 export function Header() {
